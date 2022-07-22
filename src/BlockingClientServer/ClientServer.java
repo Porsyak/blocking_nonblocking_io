@@ -9,25 +9,23 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class ClientServer {
-    public static String deleteSpaces(String string){
+    public static String deleteSpaces(String string) {
         return string.trim();
     }
 
 }
+
 class Client {
     public static void main(String[] args) {
-        System.out.println("Ведите слово с пробелами ");
         while (true) {
-            try (
-                    Socket socket = new Socket("localhost", 23445);
-                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                    Scanner scanner = new Scanner(System.in);
-                )
-            {
+            try (Socket socket = new Socket("localhost", 23445)) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                Scanner scanner = new Scanner(System.in);
+                System.out.println("Ведите слово с пробелами ");
                 String msg = scanner.nextLine();
                 out.println(msg);
-                System.out.println(in.readLine());
+                System.out.println("Сообщение от сервера: " + in.readLine());
                 if (msg.equals("end")) break;
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -40,6 +38,7 @@ class Client {
 class Server {
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(23445);) { // стартуем один раз
+
             while (true) { // в цикле (!) принимаем подключение
                 try (
                         Socket socket = serverSocket.accept();
@@ -47,16 +46,16 @@ class Server {
                         PrintWriter out = new PrintWriter(socket.getOutputStream());
                 ) {
                     String task = in.readLine();
-                    String result = ClientServer.deleteSpaces(task);
-                    out.println("Hey Client, your message without spaces " + result);
                     if (task.equals("end")) break;
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                    System.out.println("Принято сообщение от клиента: " + task);
+                    String result = ClientServer.deleteSpaces(task);
+                    out.println(result);
 
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
     }
 }
