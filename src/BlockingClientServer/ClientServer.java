@@ -9,19 +9,22 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class ClientServer {
+    public static String deleteSpaces(String string){
+        return string.trim();
+    }
 
 }
 class Client {
     public static void main(String[] args) {
+        System.out.println("Ведите слово с пробелами ");
         while (true) {
             try (
                     Socket socket = new Socket("localhost", 23445);
                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            ) {
-                Scanner scanner = new Scanner(System.in);
-
-
+                    Scanner scanner = new Scanner(System.in);
+                )
+            {
                 String msg = scanner.nextLine();
                 out.println(msg);
                 System.out.println(in.readLine());
@@ -44,7 +47,8 @@ class Server {
                         PrintWriter out = new PrintWriter(socket.getOutputStream());
                 ) {
                     String task = in.readLine();
-                    out.println("Hey Client, your message: " + task);
+                    String result = ClientServer.deleteSpaces(task);
+                    out.println("Hey Client, your message without spaces " + result);
                     if (task.equals("end")) break;
                 } catch (IOException e) {
                     throw new RuntimeException(e);
