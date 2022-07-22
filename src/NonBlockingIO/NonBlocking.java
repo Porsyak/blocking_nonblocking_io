@@ -9,6 +9,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class NonBlocking {
+    public static int getNumberFibonacci(int n){
+        if (n == 0) return 0;
+        if (n == 1) return 1;
+        return getNumberFibonacci(n - 1) + getNumberFibonacci(n - 2);
+    }
 }
 
 class Server {
@@ -28,10 +33,11 @@ class Server {
                         //если из потока читать нельзя перестаём работать с этим клиентом
                         if (byteCount == -1) break;
                         // получаем переданную строку от клиента и ощищаем буффер
-                        final String msg = new String(byteBuffer.array(), 0, byteCount, StandardCharsets.UTF_8);
+                        String msg = new String(byteBuffer.array(), 0, byteCount, StandardCharsets.UTF_8);
+                        int number =  NonBlocking.getNumberFibonacci(Integer.parseInt(msg));
                         byteBuffer.clear();
                         System.out.println("Полученно сообщение от клиента " + msg);
-                        socketChannel.write(ByteBuffer.wrap(("Вы прислали- " + msg).getBytes()));
+                        socketChannel.write(ByteBuffer.wrap(("Число фибоначи " + number).getBytes()));
                     }
                 }
             }
@@ -57,13 +63,11 @@ class Client {
                 msg = scanner.nextLine();
                 if (msg.equals("end")) break;
                 socketChannel.write(ByteBuffer.wrap(msg.getBytes()));
-                //noinspection BusyWait
-                Thread.sleep(2000);
                 int byteCount = socketChannel.read(inputBuffer);
                 System.out.println(new String(inputBuffer.array()).trim());
                 inputBuffer.clear();
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
