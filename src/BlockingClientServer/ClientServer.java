@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class ClientServer {
     public static String deleteSpaces(String string) {
-        return string.trim();
+        return string.replaceAll(" ", "");
     }
 
 }
